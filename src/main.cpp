@@ -5,6 +5,16 @@
 #include <string>
 #include <vector>
 
+struct command
+{
+    int index = 0;
+    std::vector<std::string> args;
+    std::vector<command> commands;
+    command(int _index) {index = _index;};
+};
+
+std::vector<command> fileCommands;
+
 std::vector<std::string> splitTokens(std::string string)
 {
     std::vector<std::string> tokens;
@@ -36,20 +46,32 @@ int parse(std::string line)
         return 0;
     }
 
-    std::string command = tokens[0];
+    std::string providedCommand = tokens[0];
 
     std::string compilationLine = "";
 
-    if (command == "g++" || command == "gcc")
+    if (providedCommand == "g++")
     {
-        system(line.c_str());
+        command cmd(1);
         return 0; 
     }
-    else if (command == "co")
+    else if (providedCommand == "gcc")
     {
-        compilationLine = "g++ -c " + tokens[2] + " -o " + tokens[1];  
-        system(compilationLine.c_str());
+        command cmd(2);
+        cmd.args.push_back();
+    }
+    else if (providedCommand == "co")
+    {
+        /*compilationLine = "g++ -c " + tokens[2] + " -o " + tokens[1];  
+        system(compilationLine.c_str());*/
+        command cmd(3);
         return 0; 
+    } else if (providedCommand == "IF")
+    {
+        if (stat(tokens[1]))
+        {
+
+        }
     }
 
     return 0;
