@@ -10,10 +10,48 @@ struct command
     int index = 0;
     std::vector<std::string> args;
     std::vector<command> commands;
+
     command(int _index) {index = _index;};
 };
 
 std::vector<command> fileCommands;
+
+void commandRunner(command cmd)
+{
+    int icmd = cmd.index;
+    switch(icmd)
+    {
+        case 0: // IF
+        {
+            std::ifstream file(cmd.args[1]);
+            if (file.is_open())
+            {
+                for (unsigned int i = 0; i < cmd.commands.size(); i++)
+                {
+                    commandRunner(cmd.commands[i]);
+                };
+            }
+            break;
+        }
+        case 1: // g++
+        {
+
+        }
+        case 2: // gcc
+        {
+
+        }
+        case 3: // co
+        {
+
+        }
+        default:
+        {
+            break;
+        }
+    }
+    
+}
 
 std::vector<std::string> splitTokens(std::string string)
 {
@@ -38,6 +76,9 @@ std::vector<std::string> splitTokens(std::string string)
     return tokens;
 }
 
+command* currentIFBlock = nullptr;
+bool inIFBlock = false;
+
 int parse(std::string line)
 {
     std::vector<std::string> tokens = splitTokens(line);
@@ -53,25 +94,35 @@ int parse(std::string line)
     if (providedCommand == "g++")
     {
         command cmd(1);
-        return 0; 
+        cmd.args.insert(cmd.args.begin(), tokens.begin(), tokens.end()); 
     }
     else if (providedCommand == "gcc")
     {
         command cmd(2);
-        cmd.args.push_back();
+        cmd.args.insert(cmd.args.begin(), tokens.begin(), tokens.end()); 
     }
     else if (providedCommand == "co")
     {
         /*compilationLine = "g++ -c " + tokens[2] + " -o " + tokens[1];  
         system(compilationLine.c_str());*/
         command cmd(3);
-        return 0; 
-    } else if (providedCommand == "IF")
+        cmd.args.insert(cmd.args.begin(), tokens.begin(), tokens.end());
+    } 
+    else if (providedCommand == "IF")
     {
-        if (stat(tokens[1]))
-        {
+        command cmd(0);
+        fileCommands.push_back();
 
-        }
+        inIFBlock = true;
+        currentIFBlock = &cmd;
+    }
+
+    if (inIFBlock)
+    {
+        currentIFBlock->commands.push_back(cmd);
+    }
+    else {
+        fileCom
     }
 
     return 0;
