@@ -36,15 +36,20 @@ void commandRunner(command cmd)
         }
         case 1: // g++
         {
-
+            break;
         }
         case 2: // gcc
         {
-
+            break;
         }
         case 3: // co
         {
-
+            break;
+        }
+        case 4: // MKDIR
+        {
+            mkdir(cmd.args[1].c_str(), 777);
+            break;
         }
         default:
         {
@@ -160,6 +165,14 @@ int main(int argc, char* argv[])
             {
                 printf("\n ++ Failed to Parse %s \n", line.c_str());
                 break;
+            }
+        }
+        
+        if (fileCommands.size() > 0)
+        {
+            for (unsigned int i = 0; i < fileCommands.size(); i++)
+            {
+                commandRunner(*fileCommands[i]);
             }
         }
 
