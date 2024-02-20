@@ -4,17 +4,18 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <sys/stat.h>
 
 struct command
 {
     int index = 0;
     std::vector<std::string> args;
-    std::vector<command> commands;
+    std::vector<command*> commands;
 
     command(int _index) {index = _index;};
 };
 
-std::vector<command> fileCommands;
+std::vector<command*> fileCommands;
 
 void commandRunner(command cmd)
 {
@@ -28,8 +29,8 @@ void commandRunner(command cmd)
             {
                 for (unsigned int i = 0; i < cmd.commands.size(); i++)
                 {
-                    commandRunner(cmd.commands[i]);
-                };
+                    commandRunner(*cmd.commands[i]);
+                }
             }
             break;
         }
@@ -79,9 +80,21 @@ std::vector<std::string> splitTokens(std::string string)
 command* currentIFBlock = nullptr;
 bool inIFBlock = false;
 
+void setupFunctionConnections(command* cmd)
+{
+    if (inIFBlock && currentIFBlock != nullptr)
+    {
+        currentIFBlock->commands.push_back(cmd);
+    }
+    else {
+        fileCommands.push_back(cmd);
+    }
+}
+
 int parse(std::string line)
 {
     std::vector<std::string> tokens = splitTokens(line);
+
     if (tokens.size() == 0)
     {
         return 0;
@@ -95,11 +108,13 @@ int parse(std::string line)
     {
         command cmd(1);
         cmd.args.insert(cmd.args.begin(), tokens.begin(), tokens.end()); 
+        setupFunctionConnections(&cmd); 
     }
     else if (providedCommand == "gcc")
     {
         command cmd(2);
         cmd.args.insert(cmd.args.begin(), tokens.begin(), tokens.end()); 
+        setupFunctionConnections(&cmd); 
     }
     else if (providedCommand == "co")
     {
@@ -107,24 +122,23 @@ int parse(std::string line)
         system(compilationLine.c_str());*/
         command cmd(3);
         cmd.args.insert(cmd.args.begin(), tokens.begin(), tokens.end());
+        setupFunctionConnections(&cmd); 
     } 
     else if (providedCommand == "IF")
     {
         command cmd(0);
-        fileCommands.push_back();
+        cmd.args.insert(cmd.args.begin(), tokens.begin(), tokens.end());
+        setupFunctionConnections(&cmd);
 
         inIFBlock = true;
         currentIFBlock = &cmd;
     }
-
-    if (inIFBlock)
+    else if (providedCommand == "ENDIF")
     {
-        currentIFBlock->commands.push_back(cmd);
+        inIFBlock = false;
+        currentIFBlock = nullptr;
     }
-    else {
-        fileCom
-    }
-
+     
     return 0;
 }
 
