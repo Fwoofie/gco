@@ -1,3 +1,3 @@
 IF DIR src;
-co src/main.o src/main.cpp;
+co src/main.cpp src/main.o;
 ENDIF;
