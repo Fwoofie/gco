@@ -1,5 +1,5 @@
 # GCO
-## - A simple helper for g++ compilations
+## - A simple helper for g++ compilations -
 
 This project is still in the works, but the goal is to provide a simplified alternative to CMake. The project is currently in a starting stage, but will eventually grow into a bigger program.
 
@@ -15,7 +15,7 @@ and you invoke it with
 This will attempt to parse the file and run compilations done to the users liking.
 
 
-##SEMICOLONS (;) at the end of lines are required.
+## SEMICOLONS (;) at the end of lines are required.
 
 
 
