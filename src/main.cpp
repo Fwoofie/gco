@@ -75,7 +75,12 @@ void commandRunner(command cmd)
         }
         case 4: // MKDIR
         {
+            #ifdef _WIN32
+            mkdir(cmd.args[1].c_str());
+            #else 
             mkdir(cmd.args[1].c_str(), 777);
+            #endif
+            
             break;
         }
         default:
