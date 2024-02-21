@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
@@ -10,17 +11,17 @@ struct command
 {
     int index = 0;
     std::vector<std::string> args;
-    std::vector<command*> commands;
+    std::vector<command> commands;
 
     command(int _index) {index = _index;};
 };
 
-std::vector<command*> fileCommands;
+std::vector<command> fileCommands;
 
-void commandRunner(command* givencmd)
+void commandRunner(command cmd)
 {
-    command cmd = *givencmd;
     printf("\nEven if I could.\n");
+
     int icmd = cmd.index;
     printf("\n1\n");
     std::string originalLine = cmd.args[0];
@@ -112,14 +113,16 @@ std::vector<std::string> splitTokens(std::string string)
 command* currentIFBlock = nullptr;
 bool inIFBlock = false;
 
-void setupFunctionConnections(command* cmd)
+command* setupFunctionConnections(command cmd)
 {
     if (inIFBlock && currentIFBlock != nullptr)
     {
         currentIFBlock->commands.push_back(cmd);
+        return &currentIFBlock->commands[currentIFBlock->commands.size()-1];
     }
     else {
         fileCommands.push_back(cmd);
+        return &fileCommands[fileCommands.size()-1];
     }
 }
 
@@ -140,13 +143,13 @@ int parse(std::string line)
     {
         command cmd(1);
         cmd.args.insert(cmd.args.begin(), tokens.begin(), tokens.end()); 
-        setupFunctionConnections(&cmd); 
+        setupFunctionConnections(cmd); 
     }
     else if (providedCommand == "gcc")
     {
         command cmd(2);
         cmd.args.insert(cmd.args.begin(), tokens.begin(), tokens.end()); 
-        setupFunctionConnections(&cmd); 
+        setupFunctionConnections(cmd); 
     }
     else if (providedCommand == "co")
     {
@@ -154,16 +157,16 @@ int parse(std::string line)
         system(compilationLine.c_str());*/
         command cmd(3);
         cmd.args.insert(cmd.args.begin(), tokens.begin(), tokens.end());
-        setupFunctionConnections(&cmd); 
+        setupFunctionConnections(cmd); 
     } 
     else if (providedCommand == "IF")
     {
         command cmd(0);
         cmd.args.insert(cmd.args.begin(), tokens.begin(), tokens.end());
-        setupFunctionConnections(&cmd);
+        command* allocatedCMD = setupFunctionConnections(cmd);
 
         inIFBlock = true;
-        currentIFBlock = &cmd;
+        currentIFBlock = allocatedCMD;
     }
     else if (providedCommand == "ENDIF")
     {
