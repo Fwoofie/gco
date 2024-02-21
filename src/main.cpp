@@ -17,21 +17,46 @@ struct command
 
 std::vector<command*> fileCommands;
 
-void commandRunner(command cmd)
+void commandRunner(command* givencmd)
 {
+    command cmd = *givencmd;
+    printf("\nEven if I could.\n");
     int icmd = cmd.index;
+    printf("\n1\n");
+    std::string originalLine = cmd.args[0];
+    for (unsigned int tokenI = 1; tokenI < cmd.args.size(); tokenI++)
+    {
+        printf("\n2\n");
+        originalLine = originalLine + " " + cmd.args[tokenI];
+    }
+
     switch(icmd)
     {
         case 0: // IF
         {
-            std::ifstream file(cmd.args[1]);
-            if (file.is_open())
+            if (cmd.args[1] == "FILE")
             {
-                for (unsigned int i = 0; i < cmd.commands.size(); i++)
+                std::ifstream file(cmd.args[2]);
+                if (file.is_open())
                 {
-                    commandRunner(*cmd.commands[i]);
+                    for (unsigned int i = 0; i < cmd.commands.size(); i++)
+                    {
+                        commandRunner(cmd.commands[i]);
+                    }
                 }
             }
+            else if (cmd.args[1] == "DIR")
+            {
+                struct stat statStruct;
+                if (stat(cmd.args[2].c_str(), &statStruct) == 0)
+                {
+                    for (unsigned int i = 0; i < cmd.commands.size(); i++)
+                    {
+                        commandRunner(cmd.commands[i]);
+                    }   
+                }
+            }
+
             break;
         }
         case 1: // g++
@@ -44,6 +69,7 @@ void commandRunner(command cmd)
         }
         case 3: // co
         {
+            system( std::string("g++ -c " + cmd.args[1] + " -o " + cmd.args[2]).c_str() );
             break;
         }
         case 4: // MKDIR
@@ -68,8 +94,9 @@ std::vector<std::string> splitTokens(std::string string)
     for (unsigned int i = 0; i < string.length(); i++)
     {
         char currentChar = string[i];
-        if ((currentChar == ' ' || currentChar == ';') && currentString.length() > 0)
+        if (currentChar == ' ' || currentChar == ';')
         {
+            if (currentString.length() == 0) { continue; }
             tokens.push_back(currentString);
             currentString = "";
         }
@@ -170,9 +197,11 @@ int main(int argc, char* argv[])
         
         if (fileCommands.size() > 0)
         {
+            printf("\nBefore loop\n\n");
             for (unsigned int i = 0; i < fileCommands.size(); i++)
             {
-                commandRunner(*fileCommands[i]);
+                printf("\nloop1 filecommand[%d]  \n", i);
+                commandRunner(fileCommands[i]);
             }
         }
 
