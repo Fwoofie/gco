@@ -23,7 +23,7 @@ This will attempt to parse the file and run compilations done to the users likin
 
 ****
 
-### So far, there are three commands currently:
+### Commands:
 
 ****
 ## `co`
